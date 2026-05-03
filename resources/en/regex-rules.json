@@ -1,6 +1,4 @@
 {
-  "version": 1,
-  "language": "en",
   "rules": [
     { "id": "final-s-to-z", "pattern": "s\\b", "replacement": "z", "probability": 0.55 },
     { "id": "th-to-d", "pattern": "\\bth(?!i)", "replacement": "d", "probability": 0.52 },

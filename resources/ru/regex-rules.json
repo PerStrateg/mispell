@@ -1,6 +1,4 @@
 {
-  "version": 1,
-  "language": "ru",
   "rules": [
     { "id": "tsya-to-tsa", "pattern": "тся\\b|ться\\b", "replacement": "ца", "probability": 0.75 },
     { "id": "ogo-to-ova", "pattern": "ого\\b", "replacement": "ова", "probability": 0.38 },
