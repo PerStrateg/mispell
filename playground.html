@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mispell Playground</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f4;
+      --panel: #ffffff;
+      --panel-soft: #eef2ed;
+      --ink: #20231f;
+      --muted: #626b61;
+      --line: #ccd5c8;
+      --accent: #1d6f68;
+      --accent-ink: #ffffff;
+      --danger: #9d2b37;
+      --shadow: 0 16px 42px rgba(33, 39, 32, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font: 15px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 18px clamp(16px, 3vw, 34px);
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfa;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .status {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 99px;
+      background: var(--accent);
+      flex: 0 0 auto;
+    }
+
+    .status.error .status-dot {
+      background: var(--danger);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 12px;
+      padding: 14px clamp(16px, 3vw, 34px);
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-soft);
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      min-width: 0;
+    }
+
+    select,
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 7px 9px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .range-row {
+      display: grid;
+      grid-template-columns: 1fr 44px;
+      gap: 8px;
+      align-items: center;
+      min-height: 38px;
+    }
+
+    .range-value {
+      text-align: right;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 16px;
+      padding: 16px clamp(16px, 3vw, 34px) 22px;
+      min-height: 0;
+    }
+
+    .pane {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 9px;
+    }
+
+    .pane-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 34px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: 0;
+    }
+
+    .icon-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--ink);
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .icon-btn.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .icon-btn:hover {
+      filter: brightness(0.97);
+    }
+
+    textarea,
+    .output {
+      width: 100%;
+      min-height: 390px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    textarea {
+      outline-color: var(--accent);
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 12px;
+      min-height: 18px;
+    }
+
+    .debug {
+      border-top: 1px solid var(--line);
+      background: #fbfcfa;
+      padding: 14px clamp(16px, 3vw, 34px) 22px;
+    }
+
+    .debug[hidden] {
+      display: none;
+    }
+
+    .debug-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .debug-table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      max-height: 260px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      background: var(--panel-soft);
+      position: sticky;
+      top: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .empty {
+      padding: 16px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 980px) {
+      .toolbar {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 620px) {
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      textarea,
+      .output {
+        min-height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Mispell Playground</h1>
+      <div id="status" class="status">
+        <span class="status-dot"></span>
+        <span id="statusText">Загрузка dist/mispell.iife.js</span>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Настройки">
+      <label>
+        Язык
+        <select id="language">
+          <option value="ru">ru()</option>
+          <option value="en">en()</option>
+          <option value="generic">generic()</option>
+        </select>
+      </label>
+
+      <label>
+        Профиль
+        <select id="profile">
+          <option value="typo">typo()</option>
+          <option value="scramble">scramble()</option>
+        </select>
+      </label>
+
+      <label>
+        Словари
+        <select id="dictionaries">
+          <option value="default">default</option>
+          <option value="all">all</option>
+          <option value="none">none</option>
+        </select>
+      </label>
+
+      <label>
+        Intensity
+        <span class="range-row">
+          <input id="intensity" type="range" min="0" max="1" step="0.05" value="0.5">
+          <span id="intensityValue" class="range-value">0.50</span>
+        </span>
+      </label>
+
+      <label>
+        Seed
+        <input id="seed" type="text" value="stable" autocomplete="off" spellcheck="false">
+      </label>
+
+      <label>
+        Debug
+        <span class="checkbox">
+          <input id="debug" type="checkbox">
+          operations
+        </span>
+      </label>
+    </section>
+
+    <main class="main">
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Input</h2>
+          <div class="icon-row">
+            <button id="sampleRu" class="icon-btn" type="button" title="Русский пример">RU</button>
+            <button id="sampleEn" class="icon-btn" type="button" title="English sample">EN</button>
+            <button id="clear" class="icon-btn" type="button" title="Очистить">×</button>
+            <button id="run" class="icon-btn primary" type="button" title="Искажать">▶</button>
+          </div>
+        </div>
+        <textarea id="input" spellcheck="false">Пример текста: библиотека превращает сложные слова в странные ошибки.
+Пробелы, переносы, знаки препинания и emoji 😊 должны сохраниться.</textarea>
+        <div id="inputMeta" class="meta"></div>
+      </section>
+
+      <section class="pane">
+        <div class="pane-head">
+          <h2>Output</h2>
+          <div class="icon-row">
+            <button id="copy" class="icon-btn" type="button" title="Скопировать output">⧉</button>
+          </div>
+        </div>
+        <div id="output" class="output" aria-live="polite"></div>
+        <div id="outputMeta" class="meta"></div>
+      </section>
+    </main>
+
+    <section id="debugPanel" class="debug" hidden>
+      <div class="debug-head">
+        <h2>Operations</h2>
+        <div id="debugMeta" class="meta"></div>
+      </div>
+      <div id="debugTable" class="debug-table-wrap"></div>
+    </section>
+  </div>
+
+  <script src="./dist/mispell.iife.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    const samples = {
+      ru: `Пример текста: библиотека превращает сложные слова в странные ошибки.
+Пробелы, переносы, знаки препинания и emoji 😊 должны сохраниться.`,
+      en: `Architecture is complicated, but a deterministic library should be pleasant to test.
+Spaces, newlines, punctuation, and emoji 😊 should survive.`
+    };
+
+    const state = {
+      output: ""
+    };
+
+    const controls = [
+      "language",
+      "profile",
+      "dictionaries",
+      "intensity",
+      "seed",
+      "debug",
+      "input"
+    ].map($);
+
+    function setStatus(text, error = false) {
+      $("statusText").textContent = text;
+      $("status").classList.toggle("error", error);
+    }
+
+    function createLanguage() {
+      const value = $("language").value;
+      const dictionaries = $("dictionaries").value;
+      const options = value === "generic" ? {} : { dictionaries };
+
+      if (value === "ru") return Mispell.ru(options);
+      if (value === "en") return Mispell.en(options);
+      return Mispell.generic();
+    }
+
+    function createProfile() {
+      return $("profile").value === "scramble"
+        ? Mispell.scramble()
+        : Mispell.typo();
+    }
+
+    function run() {
+      if (!window.Mispell) {
+        setStatus("Не найден dist/mispell.iife.js", true);
+        return;
+      }
+
+      const input = $("input").value;
+      const debug = $("debug").checked;
+      const intensity = Number($("intensity").value);
+      const seed = $("seed").value || undefined;
+
+      try {
+        const result = Mispell.distort(input, {
+          language: createLanguage(),
+          profile: createProfile(),
+          intensity,
+          seed,
+          debug
+        });
+
+        const output = debug ? result.text : result;
+        state.output = output;
+        $("output").textContent = output;
+        $("inputMeta").textContent = `${input.length} chars`;
+        $("outputMeta").textContent = `${output.length} chars`;
+
+        if (debug) {
+          renderDebug(result);
+        } else {
+          $("debugPanel").hidden = true;
+        }
+
+        setStatus("Готово");
+      } catch (error) {
+        $("output").textContent = error && error.message ? error.message : String(error);
+        $("outputMeta").textContent = "";
+        $("debugPanel").hidden = true;
+        setStatus("Ошибка", true);
+      }
+    }
+
+    function renderDebug(result) {
+      $("debugPanel").hidden = false;
+      $("debugMeta").textContent = `${result.operations.length} operations · ${result.language} · ${result.profile} · seed: ${result.seed}`;
+
+      if (result.operations.length === 0) {
+        $("debugTable").innerHTML = `<div class="empty">Нет операций</div>`;
+        return;
+      }
+
+      const rows = result.operations.map((operation) => `
+        <tr>
+          <td>${escapeHtml(String(operation.tokenIndex))}</td>
+          <td>${escapeHtml(operation.reason)}</td>
+          <td>${escapeHtml(operation.from)}</td>
+          <td>${escapeHtml(operation.to)}</td>
+          <td>${escapeHtml(String(operation.priority))}</td>
+        </tr>
+      `).join("");
+
+      $("debugTable").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>token</th>
+              <th>reason</th>
+              <th>from</th>
+              <th>to</th>
+              <th>priority</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function escapeHtml(value) {
+      return value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function syncIntensity() {
+      $("intensityValue").textContent = Number($("intensity").value).toFixed(2);
+    }
+
+    controls.forEach((control) => {
+      control.addEventListener("input", () => {
+        syncIntensity();
+        run();
+      });
+      control.addEventListener("change", () => {
+        syncIntensity();
+        run();
+      });
+    });
+
+    $("run").addEventListener("click", run);
+    $("clear").addEventListener("click", () => {
+      $("input").value = "";
+      run();
+    });
+    $("sampleRu").addEventListener("click", () => {
+      $("language").value = "ru";
+      $("input").value = samples.ru;
+      run();
+    });
+    $("sampleEn").addEventListener("click", () => {
+      $("language").value = "en";
+      $("input").value = samples.en;
+      run();
+    });
+    $("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(state.output);
+        setStatus("Output скопирован");
+      } catch {
+        setStatus("Clipboard недоступен", true);
+      }
+    });
+
+    syncIntensity();
+    run();
+  </script>
+</body>
+</html>
