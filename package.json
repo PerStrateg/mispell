@@ -1,0 +1,35 @@
+{
+  "name": "mispell",
+  "version": "1.0.0",
+  "description": "Deterministic text distortion engine",
+  "type": "module",
+  "main": "dist/mispell.cjs",
+  "module": "dist/mispell.esm.js",
+  "browser": "dist/mispell.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/mispell.esm.js",
+      "require": "./dist/mispell.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "resources",
+    "README.md"
+  ],
+  "scripts": {
+    "generate:resources": "tsx scripts/build-resources.ts",
+    "validate:resources": "tsx scripts/validate-resources.ts",
+    "build": "tsx scripts/build-resources.ts && tsc -p tsconfig.build.json && tsx scripts/build.ts",
+    "test": "tsx scripts/build-resources.ts && tsx scripts/build.ts && vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "esbuild": "^0.25.4",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
